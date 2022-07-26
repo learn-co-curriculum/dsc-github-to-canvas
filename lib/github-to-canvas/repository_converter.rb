@@ -13,6 +13,8 @@ class RepositoryConverter
     raw_remote_url = self.set_raw_image_remote_url(options[:filepath])
     markdown = self.fix_local_images(options, markdown, raw_remote_url)
     html = self.convert_to_html(markdown)
+    # TODO: update so that this only runs with certain CLI args
+    html = self.format_equations(html)
     # self.fix_local_html_links(options, html, options[:filepath])
   end
 
@@ -24,6 +26,8 @@ class RepositoryConverter
     end
     markdown = self.fix_local_images(options, markdown, raw_remote_url)
     html = self.convert_to_html(markdown)
+    # TODO: update so that this only runs with certain CLI args
+    html = self.format_equations(html)
     # self.fix_local_html_links(options, html, options[:filepath])
   end
 
@@ -41,6 +45,15 @@ class RepositoryConverter
   end
 
   def self.adjust_converted_html(options, html)
+    if options[:header_only]
+      list_end = "</ul>"
+      if html.include? list_end
+        html = html.split(list_end)[0] + list_end
+      else
+        html = ""
+      end
+    end
+
     if options[:remove_header_and_footer]
       html = self.remove_header_and_footer(html)
     end
@@ -88,6 +101,25 @@ class RepositoryConverter
     self.adjust_local_markdown_images(markdown, raw_remote_url, options[:branch])
     self.adjust_local_html_images(markdown, raw_remote_url, options[:branch])
     markdown
+  end
+
+  def self.format_equations(readme)
+    # block equations are surrounded by $$, inline equations are surrounded by $
+    ["$$", "$"].each do |separator|
+      tokens = readme.split(separator)
+      readme = tokens.map.with_index do |token, index|
+        if (index % 2) == 0
+          # even index means it's not between $$ or $, leave as-is
+          token
+        else
+          # backslash literals need to be encoded TWICE for some reason
+          src_url = "/equation_images/" + token.gsub("\\", "%255C")
+          img = "<img class='equation_image' title='#{token}' src='#{src_url}' alt='{'LaTeX: '#{token}}' data-equation-content='#{token}' />"
+          separator == "$$" ? "<p>#{img}</p>" : img
+        end
+      end.join("")
+    end
+    readme
   end
 
   def self.get_github_base_url(filepath)
