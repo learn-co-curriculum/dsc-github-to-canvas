@@ -45,7 +45,14 @@ class RepositoryConverter
   end
 
   def self.adjust_converted_html(options, html)
-    return self.add_fis_links(options, "") if options[:header_only]
+    if options[:header_only]
+      list_end = "</ul>"
+      if html.include? list_end
+        html = html.split(list_end)[0] + list_end
+      else
+        html = ""
+      end
+    end
 
     if options[:remove_header_and_footer]
       html = self.remove_header_and_footer(html)
