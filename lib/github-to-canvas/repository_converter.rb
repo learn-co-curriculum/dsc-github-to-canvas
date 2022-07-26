@@ -26,6 +26,8 @@ class RepositoryConverter
     end
     markdown = self.fix_local_images(options, markdown, raw_remote_url)
     html = self.convert_to_html(markdown)
+    # TODO: update so that this only runs with certain CLI args
+    html = self.format_equations(html)
     # self.fix_local_html_links(options, html, options[:filepath])
   end
 
