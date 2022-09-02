@@ -2,6 +2,8 @@
 
 ## Introduction
 
+This is a Data Science version of the `github-to-canvas` gem hosted at https://github.com/learn-co-curriculum/github-to-canvas. In the long term it would ideally have its changes merged in to that project but for now it has diverged.
+
 The `github-to-canvas` gem is designed to aid in integrating GitHub and the
 Canvas LMS. This gem takes a GitHub repository's `README.md` file, converts it
 to HTML, and pushes it to Canvas using the Canvas API. This gem can also update
@@ -16,50 +18,48 @@ also required for some features.
 
 ## Installation
 
-`gem install github-to-canvas`
+**Prerequisite:** you need to have Ruby and RubyGems (package manager) installed on your computer. You can test this by running `which ruby` and `which gem` in the terminal, and each time a path to the executable should print out. Modern macOS comes with these already installed, or you can go [here](https://wiki.openstack.org/wiki/RubyGems) for additional installation instructions.
+
+1. Clone this repository to your local computer and navigate to the root of it in the terminal
+2. Open up `lib/github-to-canvas/version.rb` in a text editor, and increase the string value associated with `VERSION` (e.g. bump from 0.1.18 to 0.1.19)
+3. Build the gem by running `gem build github-to-canvas.gemspec`
+4. Install the gem by running `gem install github-to-canvas-<version>.gem` where `<version>` depends on what you did in step 2
+   - For example, if you made the version 0.1.19, the command would be `gem install github-to-canvas-0.1.19.gem`
+   - If you get a permissions error at this step, next you should try adding the `--user-install` flag. So, for example, `gem install --user-install github-to-canvas-0.1.19.gem`
+   - If you _again_ get a permissions error even with `--user-install`, you can try putting `sudo` before the `gem install`. This will prompt you for your computer password. This approach will install the gem globally/as root and can have unintended consequences, although for most DS Curriculum Developers you don't actually need to do a lot of Ruby development so it's not that likely to cause any actual problems
+5. Check that the installation was successful by running `which github-to-canvas`
+   - If this prints a path, that means it worked
+   - If this prints nothing or "not found", you need to update your path so that your terminal can find the gem executable.
+      - This means editing your `~/.bash_profile` or `~/.zshrc` and adding a line with the format `export PATH="/Users/<username>/.gem/ruby/<version>/bin:$PATH"` and then restarting the terminal. For example, if your username is `erinhoffman` and your Ruby version is 2.6.0, the line would be `export PATH="/Users/erinhoffman/.gem/ruby/2.6.0/bin:$PATH"`
+      - Hopefully if you scroll up to the install step you will see a warning that says what you need to add to your `PATH`. If not you will just need to do some exploring (`cd`, `ls -a`, `pwd`, etc.) to figure out where `github-to-canvas` was installed
 
 ## Setup
 
 ### Generate Canvas API Key
 
 In order to access the Canvas API, you must first generate an API key. Go to
-your Canvas Account Settings and under **Approved Integrations**, create a
+your Canvas Account Settings on learning.flatironschool.com and under **Approved Integrations**, create a
 **New Access Token**. You will need to store this API key as an `ENV` variable
 called `CANVAS_API_KEY`.
 
-If you are using Zsh, the following command will add your new key to the top of `~/.zshrc`:
+### Set Up Environment Variables
 
-```sh
-echo "$(export 'CANVAS_API_KEY=<your-new-API-key-here>' | cat - ~/.zshrc)" > ~/.zshrc
+If you are using Z shell, add the following lines to your `~/.zshrc`. If you are using Bash, add them to your `~/.bash_profile`.
+
+```
+export CANVAS_API_KEY="<your new API key here>"
+export CANVAS_API_PATH="https://learning.flatironschool.com/api/v1"
 ```
 
-If you are using Bash, use this command instead:
+Where `<your new API key here>` has been replaced by your actual API key, e.g. `export CANVAS_API_KEY="sdlfj_kb_aeksjfaeb2348dbse"`.
 
-```sh
-echo "$(export 'CANVAS_API_KEY=<your-new-API-key-here>' | cat - ~/.bash_profile)" > ~/.bash_profile
-```
+If you are working on a different Canvas instance (e.g. my.learn.co) you will need to get a new API key for that instance and replace the path as well. Just replace the `learning.flatironschool.com` part, leaving the `/api/v1` part as-is. (You can also just use # to comment out the unused variables instead of deleting them from the file when switching between Canvas instances.)
 
-> If you aren't sure which you use, run `echo $SHELL`
+When you are done editing the config file, restart the terminal. Then if you run `echo $CANVAS_API_KEY` it should print out your API key, and if you run `echo $CANVAS_API_PATH` it should print out `https://learning.flatironschool.com/api/v1`
 
-### Add Canvas API Base Path
+## Data Science Common Commands
 
-The exact Canvas API path is specific to where your Canvas LMS is located. For example,
-Flatiron School's base path is `https://learning.flatironschool.com/api/v1`. Add this path
-as an `ENV` variable like the API key. **Do not add a `/` at the end after `/api/v1`.**
-
-```sh
-echo "$(export 'CANVAS_API_PATH=<your-base-api-path>' | cat  - ~/.zshrc)" > ~/.zshrc
-```
-
-Or for Bash:
-
-```sh
-echo "$(export 'CANVAS_API_PATH=<your-base-api-path>' | cat  - ~/.bash_profile)" > ~/.bash_profile
-```
-
-After both the API key and path are added to `~/.zshrc`, run `source ~/.zshrc` (`source ~/.bash_profile` for Bash)
-to make them available in your current terminal. You can verify these variables
-are present by running `ENV` and finding them in the output list.
+See [this Google Doc](https://docs.google.com/document/d/1gi2nPgLdFTY1eKedlkF9vfA5Z48uhZfIEnvjsbbk7zQ/edit?usp=sharing) for the recommended instruction set used in the data science curriculum. This is layered on top of the documentation listed later on this page.
 
 ## Common Uses
 
